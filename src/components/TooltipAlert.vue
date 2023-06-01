@@ -24,7 +24,6 @@ const props = defineProps<TooltipAlertProps>();
   &__content {
     position: absolute;
     top: -30px;
-    background-color: rgba(244, 10, 10, 0.8);
     color: #fff;
     padding: 4px 8px;
     border-radius: 5px;

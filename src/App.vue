@@ -5,20 +5,15 @@
         <span class="widget__title">Crypto Exchange</span>
         <span class="widget__subtitle">Exchange fast and easy</span>
         <div v-if="currencyList.length !== 0" class="widget__form">
-          <tooltip-alert
-            text="Exchange amount is below minimum"
-            :is-open="primaryInputIsError"
-          >
-            <input-with-select
-              v-if="primaryInput.currency"
-              :options="currencyList"
-              :select-value="primaryInput.currency"
-              :input-value="primaryInput.value"
-              :is-error="primaryInputIsError"
-              @on-select="handlePrimarySelect"
-              @on-input="handlePrimaryInput"
-            />
-          </tooltip-alert>
+          <input-with-select
+            v-if="primaryInput.currency"
+            :options="currencyList"
+            :select-value="primaryInput.currency"
+            :input-value="primaryInput.value"
+            :is-error="primaryInputIsError"
+            @on-select="handlePrimarySelect"
+            @on-input="handlePrimaryInput"
+          />
           <inline-svg :src="Swap" class="widget__swap" @click="handleSwap" />
           <input-with-select
             v-if="secondaryInput.currency"
@@ -28,6 +23,24 @@
             is-read-only
             @on-select="handleSecondarySelect"
           />
+        </div>
+        <div class="widget__address">
+          <div class="widget__email">
+            <label>Your Ethereum address</label>
+            <input type="email" />
+          </div>
+          <TextButton class="widget__button" :is-disabled="primaryInputIsError">
+            Exchange
+            <span
+              v-if="primaryInputIsError && !isPairDisabled"
+              class="widget__error"
+            >
+              Exchange amount is below minimum
+            </span>
+            <span v-else-if="isPairDisabled" class="widget__error">
+              This pair is disabled now
+            </span>
+          </TextButton>
         </div>
       </div>
     </div>
@@ -47,7 +60,7 @@ import {
 } from "@/API/requests";
 import Swap from "@/assets/icons/swap.svg";
 import InputWithSelect from "@/components/InputWithSelect.vue";
-import TooltipAlert from "@/components/TooltipAlert.vue";
+import TextButton from "@/components/TextButton.vue";
 
 const currencyList = ref<Currency[]>([]);
 
@@ -85,8 +98,6 @@ const handleMinimumAmount = async () => {
 };
 
 const handleEstimatedExchangeAmount = async () => {
-  if (!primaryInput.minAmount) return;
-
   const params: EstimatedExchangeAmountRequest = {
     fromCurrency: primaryInput.currency?.ticker ?? "",
     toCurrency: secondaryInput.currency?.ticker ?? "",
@@ -136,6 +147,13 @@ const primaryInputIsError = computed(
   () => primaryInput.minAmount > Number(primaryInput.value)
 );
 
+const isPairDisabled = computed(
+  () =>
+    primaryInput.minAmount === null ||
+    primaryInput.minAmount === undefined ||
+    secondaryInput.value === null
+);
+
 onBeforeMount(async () => {
   currencyList.value = await fetchCurrencyList();
   primaryInput.currency = currencyList.value[0];
@@ -172,14 +190,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1400px;
+  max-width: 1400px;
+  margin-inline: 20px;
   height: 800px;
   color: #282828;
 
   &__wrapper {
     display: flex;
     flex-direction: column;
-    width: 960px;
+    max-width: 960px;
+    width: 100%;
   }
 
   &__title {
@@ -199,10 +219,64 @@ body {
     align-items: center;
     gap: 16px;
     margin-top: 60px;
+
+    @media only screen and (max-width: 720px) {
+      flex-direction: row;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
   }
 
   &__swap {
     cursor: pointer;
+  }
+
+  &__address {
+    margin-top: 63px;
+    display: flex;
+    width: 100%;
+    height: 51px;
+    gap: 32px;
+  }
+
+  &__email {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    input {
+      background: #f6f7f8;
+      border: 1px solid #e3ebef;
+      border-radius: 5px;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 16px;
+      line-height: 23px;
+
+      &:focus-visible {
+        outline: none;
+      }
+    }
+
+    label {
+      position: absolute;
+      top: -24px;
+    }
+  }
+
+  &__button {
+    position: relative;
+
+    span {
+      position: absolute;
+      bottom: -100%;
+      font-size: 16px;
+      line-height: 23px;
+      color: #e03f3f;
+      text-transform: lowercase;
+    }
   }
 }
 </style>

@@ -94,11 +94,6 @@ const searchValue = ref("");
 const handleSelectOpen = () => (isOpen.value = !isOpen.value);
 
 const itemSize = 48;
-const calculatedDropdownHeight = computed(() =>
-  filteredOptions.value.length < 3
-    ? filteredOptions.value.length * itemSize
-    : itemSize * 3
-);
 const hideDropdown = () => (isOpen.value = false);
 const handleOptionSelect = (item: Currency) => {
   if (props.selectValue !== item) {
@@ -120,6 +115,12 @@ const filteredOptions = computed((): typeof props.options => {
     filterCurrencyByString(option, searchValue.value)
   );
 });
+
+const calculatedDropdownHeight = computed(() =>
+  filteredOptions.value.length < 3
+    ? filteredOptions.value.length * itemSize
+    : itemSize * 3
+);
 
 const handleInput = debounce((value: string) => {
   emits("onInput", value);
