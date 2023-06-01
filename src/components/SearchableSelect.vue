@@ -1,6 +1,7 @@
 <template>
   <div class="searchable-select">
     <searchable-select-item
+      class="searchable-select__select"
       :image="selectedItem.image"
       :ticker="selectedItem.ticker"
     />
@@ -18,9 +19,10 @@
 
 <script setup lang="ts">
 import { defineEmits, defineProps } from "vue";
+
+import { Currency } from "@/@types/currency";
 import ArrowDown from "@/assets/icons/arrow-down.svg";
 import SearchableSelectItem from "@/components/SearchableSelectItem.vue";
-import { Currency } from "@/@types/currency";
 
 export interface SearchableSelectProps {
   selectedItem: Currency | undefined;
@@ -38,8 +40,8 @@ const handleClick = () => emits("handleClick");
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 108px;
-  padding-right: 8px;
+  width: 100%;
+  max-width: 110px;
 
   &__action {
     border: none;
